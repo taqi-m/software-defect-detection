@@ -24,6 +24,54 @@ color: white; padding: 2rem; border-radius: 15px; margin: 1.5rem 0; box-shadow: 
 border-radius: 20px; display: inline-block; margin: 0.3rem; font-weight: 600;}
 .no-defect {background-color: #27ae60; color: white; padding: 0.5rem 1rem; 
 border-radius: 20px; display: inline-block; margin: 0.3rem; font-weight: 600;}
+
+/* Styled radio buttons */
+div[role="radiogroup"] {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+div[role="radiogroup"] label {
+    background-color: white;
+    border: 2px solid #dfe1e5;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 150px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+div[role="radiogroup"] label:hover {
+    border-color: #e74c3c;
+    box-shadow: 0 2px 8px rgba(231,76,60,0.15);
+    transform: translateY(-1px);
+}
+div[role="radiogroup"] label:has(input:checked) {
+    background-color: #fff5f5;
+    border-color: #e74c3c;
+    border-width: 2px;
+    color: #e74c3c;
+    font-weight: 600;
+    box-shadow: 0 2px 12px rgba(231,76,60,0.25);
+}
+div[role="radiogroup"] input[type="radio"] {
+    margin-right: 0.5rem;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    div[role="radiogroup"] {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    div[role="radiogroup"] label {
+        width: 100%;
+        min-width: unset;
+    }
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -85,15 +133,6 @@ if not models:
     st.error("No models found. Run the notebook to train and export models.")
     st.stop()
 
-# Sidebar
-with st.sidebar:
-    st.markdown("## ⚙️ Configuration")
-    model_choice = st.selectbox("Select Model", list(models.keys()))
-    
-    st.markdown("---")
-    st.markdown("### Defect Types")
-    st.text("• Blocker\n• Regression\n• Bug\n• Documentation\n• Enhancement\n• Task\n• Dependency Upgrade")
-
 # Main content
 st.info("Enter a bug report description to predict defect types")
 
@@ -121,6 +160,10 @@ else:
         if 'report' in df.columns:
             bug_report = df['report'].iloc[0]
             st.success(f"Loaded: {bug_report[:100]}...")
+
+# Model selection
+st.markdown("### ⚙️ Model Selection")
+model_choice = st.radio("Choose prediction model:", list(models.keys()), horizontal=True, label_visibility="collapsed")
 
 # Prediction
 if bug_report and st.button("🚀 Predict Defect Types", use_container_width=True):
